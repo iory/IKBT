@@ -1,5 +1,6 @@
 __all__ = ['Blackboard']
 
+
 class Blackboard(object):
     def __init__(self):
         self._base_memory = {}
@@ -41,17 +42,15 @@ class Blackboard(object):
     def get(self, key, tree_scope=None, node_scope=None):
         memory = self._get_memory(tree_scope, node_scope)
         return memory.get(key)
- 
-    #BH make it easier to increment a BB value
+
+    # BH make it easier to increment a BB value
     def inc(self, key, value, tree_scope=None, node_scope=None):
         memory = self._get_memory(tree_scope, node_scope)
         a = 5
         if (type(a) == type(memory[key])):
-           memory[key] += value
+            memory[key] += value
         else:
-	  print type(memory[key])
-	  print type(a)
-	  print "Blackboard increment error - must be an int"
-	  quit()
-    
-      
+            print type(memory[key])
+            print type(a)
+            print "Blackboard increment error - must be an int"
+            quit()

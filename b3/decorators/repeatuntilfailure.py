@@ -2,6 +2,7 @@ import b3
 
 __all__ = ['RepeatUntilFailure']
 
+
 class RepeatUntilFailure(b3.Decorator):
     def __init__(self, child, max_loop=-1):
         super(RepeatUntilFailure, self).__init__(child)
@@ -26,5 +27,3 @@ class RepeatUntilFailure(b3.Decorator):
 
         tick.blackboard.set('i', i, tick.tree.id, self.id)
         return status
-
-        

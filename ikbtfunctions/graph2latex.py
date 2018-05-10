@@ -22,39 +22,40 @@ import sympy as sp
 ##import re
 #from solution_graph_v2 import *
 #from sys import exit
-#import b3 as b3          # behavior trees
-#import pickle 
+# import b3 as b3          # behavior trees
+#import pickle
 #import helperfunctions as hf
 #from kin_cl import *
 
+
 class newnode:
     def __init__(self):
-        self.symbol = '' 
+        self.symbol = ''
         self.order = ''
         self.eqn = ''
         self.Node = []     # Solution node for this variable
         self.children = []
         self.parents = []
-        
+
     def __hash__(self):
         return self.symbol.__hash__()
-    
-    def __eq__(self, other): #equal judgement, also hashing in python 3.x
+
+    def __eq__(self, other):  # equal judgement, also hashing in python 3.x
         value = False
         if type(self) != type(other):
             return False
         if self.symbol == other.symbol:
             value = True
         return value
-    
-    def __repr__(self): # string representation
+
+    def __repr__(self):  # string representation
         child = '-none-'
         parent = '-none-'
         if (len(self.children) > 0):
             child = str(self.children[0].symbol)
         if (len(self.parents) > 0):
             parent = str(self.parents[0].symbol)
-        return 'Newnode: ' + str(self.symbol) + ' child[0]: ' +child + ', parents[0]: ' + parent + '\n'
+        return 'Newnode: ' + str(self.symbol) + ' child[0]: ' + child + ', parents[0]: ' + parent + '\n'
 
 
 def tikz_setup():
@@ -79,9 +80,11 @@ def tikz_setup():
     },
 }
 '''
- 
-#def tikz_startpicture():
-    #return r"\begin{tikzpicture}[node distance=2cm and 1cm,>=stealth',auto, every place/.style={draw}]"
+
+# def tikz_startpicture():
+    # return r"\begin{tikzpicture}[node distance=2cm and 1cm,>=stealth',auto, every place/.style={draw}]"
+
+
 def tikz_startpicture():
     return r'''\begin{tikzpicture}[sibling distance=10em, every node/.style = {shape=rectangle, rounded corners,
     draw, align=center, top color=white, bottom color=blue!20}]]
@@ -90,35 +93,41 @@ def tikz_startpicture():
 \tikzstyle{level 3}=[sibling distance=10mm] 
 '''
 
-#def tikz_place_node(name, label, control_string):
-def tikz_place_node( label ):
+# def tikz_place_node(name, label, control_string):
+
+
+def tikz_place_node(label):
     #\node [place] (S3) [node distance=1.5cm,below =of right-S1] {S3};
-    #name = label.replace(r'\$',r'') # no eqn formatting for internal node name
-    #name = label.replace(r'_',r'') # no eqn formatting for internal node name
-    #return r' \node [place] ('+ name + ') ['+control_string+'] {'+label+'};'
-    return r' \node {'+label+'} '
+    # name = label.replace(r'\$',r'') # no eqn formatting for internal node name
+    # name = label.replace(r'_',r'') # no eqn formatting for internal node name
+    # return r' \node [place] ('+ name + ') ['+control_string+'] {'+label+'};'
+    return r' \node {' + label + '} '
 
-def tikz_place_children(n,f):
-        #TO DO: silence this on the console for better output
-        print 'Place children: ', n
-        if len(n.parents)> 0: # must have a parent else its root!
-            print >>f, 'child { node {$' + sp.latex(n.symbol).replace(r'th_', r'\theta_') + '$}  '
-        for c in n.children:
-            print >>f, '   ',
-            tikz_place_children(c,f)
-        if len(n.parents) > 0:
-            print >>f, '}'
 
-def tikz_place_edge(from_node, to_node, label,control_string = ''):
+def tikz_place_children(n, f):
+        # TO DO: silence this on the console for better output
+    print 'Place children: ', n
+    if len(n.parents) > 0:  # must have a parent else its root!
+        print >>f, 'child { node {$' + \
+            sp.latex(n.symbol).replace(r'th_', r'\theta_') + '$}  '
+    for c in n.children:
+        print >>f, '   ',
+        tikz_place_children(c, f)
+    if len(n.parents) > 0:
+        print >>f, '}'
+
+
+def tikz_place_edge(from_node, to_node, label, control_string=''):
     #\path[->] (S3) edge [bend left] node {a} (S1);
-    return r'\path[->] ('+from_node+') edge ['+control_string+'] node {'+label+'} ('+to_node+');'
-                        
+    return r'\path[->] (' + from_node + ') edge [' + control_string + '] node {' + label + '} (' + to_node + ');'
+
+
 def tikz_closepicture():
     return r'; \end{tikzpicture}'
 
 
 if __name__ == "__main__":
-    f = open('test_graph.tex','w')
+    f = open('test_graph.tex', 'w')
     print >>f, '''\documentclass[letterpaper]{article}
 
 % Uncomment for bibliog.
@@ -131,13 +140,12 @@ if __name__ == "__main__":
     print >>f, r'\begin{document} \section{}'
     print >>f, '%  move above stuff before \begin{document}'
     print >>f, tikz_startpicture()
-    print >>f, tikz_place_node('N1', '$N_1$','')
-    print >>f, tikz_place_node('N2', '$N_2$','right =of N1')
-    print >>f, tikz_place_node('N3', '$N_3$','below =of N1')
-    print >>f, tikz_place_node('N4', '$N_4$','below =of N2')
-    print >>f, tikz_place_edge('N2', 'N3', '$\pm\sqrt{x}$','')
+    print >>f, tikz_place_node('N1', '$N_1$', '')
+    print >>f, tikz_place_node('N2', '$N_2$', 'right =of N1')
+    print >>f, tikz_place_node('N3', '$N_3$', 'below =of N1')
+    print >>f, tikz_place_node('N4', '$N_4$', 'below =of N2')
+    print >>f, tikz_place_edge('N2', 'N3', '$\pm\sqrt{x}$', '')
     print >>f, tikz_place_edge('N1', 'N3', 'atan2()', 'bend right')
     print >>f, tikz_place_edge('N3', 'N4', 'asin()', 'bend right')
     print >>f, tikz_closepicture()
     print >>f, r'\end{document}'
-    

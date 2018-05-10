@@ -6,7 +6,7 @@ import b3
 
 # Copyright 2017 University of Washington
 
-# Developed by Dianmu Zhang <dianmuz at uw.edu> and 
+# Developed by Dianmu Zhang <dianmuz at uw.edu> and
 # Blake Hannaford <blake at uw.edu>
 # BioRobotics Lab, University of Washington
 
@@ -21,7 +21,6 @@ import b3
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
 __all__ = ['OrNode']
 
 
@@ -33,13 +32,13 @@ class OrNode(b3.Composite):
     def tick(self, tick):
         self.Cost = 0
         status = b3.FAILURE
-        
+
         for node in self.children:
-          status_curr = node._execute(tick)
-          #Add in cost of selected leaf (requires zero cost for Seq node)
-          
-          self.Cost += node.Cost
-          if status_curr != b3.FAILURE:
+            status_curr = node._execute(tick)
+            # Add in cost of selected leaf (requires zero cost for Seq node)
+
+            self.Cost += node.Cost
+            if status_curr != b3.FAILURE:
                 status = b3.SUCCESS
 
         return status

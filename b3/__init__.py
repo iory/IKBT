@@ -1,13 +1,13 @@
-VERSION   = '0.1.0'
+VERSION = '0.1.0'
 
-SUCCESS   = 1
-FAILURE   = 2
-RUNNING   = 3
-ERROR     = 4
+SUCCESS = 1
+FAILURE = 2
+RUNNING = 3
+ERROR = 4
 
 COMPOSITE = 'composite'
 DECORATOR = 'decorator'
-ACTION    = 'action'
+ACTION = 'action'
 CONDITION = 'condition'
 
 # CORE
@@ -41,4 +41,3 @@ from b3.decorators.maxtime import MaxTime
 from b3.decorators.repeater import Repeater
 from b3.decorators.repeatuntilfailure import RepeatUntilFailure
 from b3.decorators.repeatuntilsuccess import RepeatUntilSuccess
-

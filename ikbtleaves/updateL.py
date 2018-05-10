@@ -27,19 +27,23 @@ from sys import exit
 
 from ikbtfunctions.helperfunctions import *
 from ikbtbasics.kin_cl import *
-from ikbtbasics.ik_classes import *     # special classes for Inverse kinematics in sympy
+# special classes for Inverse kinematics in sympy
+from ikbtbasics.ik_classes import *
 from ikbtfunctions.ik_robots import *
 
 import b3 as b3          # behavior trees
 import pickle     # for storing pre-computed FK eqns
 
+
 class updateL(b3.Action):    # Set up the equation lists
     def tick(self, tick):
         R = tick.blackboard.get('Robot')   # the current matrix equation
-        variables = tick.blackboard.get('unknowns')   # the current list of unknowns
+        # the current list of unknowns
+        variables = tick.blackboard.get('unknowns')
 
         R.sum_of_angles_transform(variables)
-        [L1, L2, L3p] = R.scan_for_equations(variables)   # get the equation lists
+        [L1, L2, L3p] = R.scan_for_equations(
+            variables)   # get the equation lists
 
         tick.blackboard.set('eqns_1u', L1)  # eqns w/ 1 unknown
         tick.blackboard.set('eqns_2u', L2)  # eqns w/ 2 unknowns
@@ -51,7 +55,8 @@ class updateL(b3.Action):    # Set up the equation lists
 #####################################################################################
 # Test code below.  See sincos_solver.py for example
 #
-class TestSolver007(unittest.TestCase):    # change TEMPLATE to unique name (2 places)
+# change TEMPLATE to unique name (2 places)
+class TestSolver007(unittest.TestCase):
     # def setUp(self):
         # self.DB = False  # debug flag
         # print '===============  Test updateL.py  ====================='
@@ -66,7 +71,7 @@ class TestSolver007(unittest.TestCase):    # change TEMPLATE to unique name (2 p
         #
         #   Check for a pickle file of pre-computed Mech object. If the pickle
         #       file is not there, compute the kinematic equations
-        ####  Using PUMA 560 also tests scan_for_equations() and sum_of_angles_transform()  in ik_classes.py
+        # Using PUMA 560 also tests scan_for_equations() and sum_of_angles_transform()  in ik_classes.py
         #
         #   The famous Puma 560  (solved in Craig)
         #
@@ -76,29 +81,33 @@ class TestSolver007(unittest.TestCase):    # change TEMPLATE to unique name (2 p
         pickname = 'fk_eqns/Puma_pickle.p'
         if(os.path.isfile(pickname)):
             print 'a pickle file will be used to speed up'
-        else: 
+        else:
             print 'There was no pickle file'
         print '------------'
 
-        #return [dh, vv, params, pvals, variables]
+        # return [dh, vv, params, pvals, variables]
         robot = 'Puma'
-        [dh, vv, params, pvals, unknowns] = robot_params(robot)  # see ik_robots.py
-        #def kinematics_pickle(rname, dh, constants, pvals, vv, unks, test):
+        [dh, vv, params, pvals, unknowns] = robot_params(
+            robot)  # see ik_robots.py
+        # def kinematics_pickle(rname, dh, constants, pvals, vv, unks, test):
         Test = True
-        [M, R, unk_Puma] = kinematics_pickle(robot, dh, params, pvals, vv, unknowns, Test)
+        [M, R, unk_Puma] = kinematics_pickle(
+            robot, dh, params, pvals, vv, unknowns, Test)
         print 'GOT HERE: updateL robot name: ', R.name
 
-        R.name = 'test: '+ robot # ??? TODO: get rid of this (but fix report)
+        R.name = 'test: ' + robot  # ??? TODO: get rid of this (but fix report)
 
-        ##   check the pickle in case DH params were changed
-        check_the_pickle(M.DH, dh)   # check that two mechanisms have identical DH params
+        # check the pickle in case DH params were changed
+        # check that two mechanisms have identical DH params
+        check_the_pickle(M.DH, dh)
 
         testerbt = b3.BehaviorTree()
         setup = updateL()
         setup.BHdebug = True
         bb = b3.Blackboard()
-        testerbt.root= b3.Sequence([setup])  # this just runs updateL - not real solver
-        bb.set('Robot',R)
+        # this just runs updateL - not real solver
+        testerbt.root = b3.Sequence([setup])
+        bb.set('Robot', R)
         bb.set('unknowns', unk_Puma)
 
         testerbt.tick('test', bb)
@@ -110,31 +119,35 @@ class TestSolver007(unittest.TestCase):    # change TEMPLATE to unique name (2 p
         fs = 'updateL: equation list building   FAIL'
         #  these self.assertTrues are not conditional - no self.assertTrueion counting needed
         self.assertTrue(L1[0].RHS == d_3, fs)
-        self.assertTrue(L1[0].LHS == -Px*sp.sin(th_1)+Py*sp.cos(th_1), fs)
-        self.assertTrue(L2[0].RHS == -a_2*sp.sin(th_2)-a_3*sp.sin(th_23) + d_1 - d_4*(sp.cos(th_23)), fs)
+        self.assertTrue(L1[0].LHS == -Px * sp.sin(th_1) +
+                        Py * sp.cos(th_1), fs)
+        self.assertTrue(L2[0].RHS == -a_2 * sp.sin(th_2) -
+                        a_3 * sp.sin(th_23) + d_1 - d_4 * (sp.cos(th_23)), fs)
         self.assertTrue(L2[0].LHS == Pz, fs)
 
         #########################################
         # test R.set_solved
 
-        u = unk_Puma[2]  #  here's what should happen when we set up two solutions
+        # here's what should happen when we set up two solutions
+        u = unk_Puma[2]
         sp.var('Y X B')
-        u.solutions.append(sp.atan2(Y,X)) #  # make up some equations
-        u.solutions.append(sp.atan2(-Y, X)) #
+        u.solutions.append(sp.atan2(Y, X))  # make up some equations
+        u.solutions.append(sp.atan2(-Y, X))
         #   assumptions are used when a common denominator is factored out
         u.assumption.append(sp.Q.positive(B))  # right way to say "non-zero"?
         u.assumption.append(sp.Q.negative(B))
         u.nsolutions = 2
-        u.set_solved(R, unk_Puma)  #  test the set solved function
+        u.set_solved(R, unk_Puma)  # test the set solved function
         fs = 'updateL: testing R.set_solved   FAIL '
         self.assertTrue(not u.readytosolve, fs)
-        self.assertTrue(    u.solved      , fs)
-        self.assertTrue(R.solveN == 1, fs)  # when initialized solveN=0 set_solved should increment it
+        self.assertTrue(u.solved, fs)
+        # when initialized solveN=0 set_solved should increment it
+        self.assertTrue(R.solveN == 1, fs)
 
         # solutiontreenodes no longer used
-        #self.assertTrue(len(R.solutiontreenodes) == 3, fs)  # we should now have three nodes (root + two solns)
+        # self.assertTrue(len(R.solutiontreenodes) == 3, fs)  # we should now have three nodes (root + two solns)
 
-        #print '\n\n\n               updateL    PASSES ALL TESTS  \n\n'
+        # print '\n\n\n               updateL    PASSES ALL TESTS  \n\n'
 
 
 #
@@ -145,16 +158,15 @@ class TestSolver007(unittest.TestCase):    # change TEMPLATE to unique name (2 p
 
 def run_test():
     print '\n\n===============  Test updateL.py ====================='
-    testsuite = unittest.TestLoader().loadTestsFromTestCase(TestSolver007)  # replace TEMPLATE
+    testsuite = unittest.TestLoader().loadTestsFromTestCase(
+        TestSolver007)  # replace TEMPLATE
     unittest.TextTestRunner(verbosity=2).run(testsuite)
+
 
 if __name__ == "__main__":
 
     print '\n\n===============  Test updateL.py ====================='
-    testsuite = unittest.TestLoader().loadTestsFromTestCase(TestSolver007)  # replace TEMPLATE
+    testsuite = unittest.TestLoader().loadTestsFromTestCase(
+        TestSolver007)  # replace TEMPLATE
     unittest.TextTestRunner(verbosity=2).run(testsuite)
-    #unittest.main()
-
-
-
-
+    # unittest.main()

@@ -2,6 +2,7 @@ import b3
 
 __all__ = ['Limiter']
 
+
 class Limiter(b3.Decorator):
     def __init__(self, child, max_loop):
         super(Limiter, self).__init__(child)
@@ -20,9 +21,8 @@ class Limiter(b3.Decorator):
             status = self.child._execute(tick)
 
             if status == b3.SUCCESS or status == b3.FAILURE:
-                tick.blackboard.set('i', i+1, tick.tree.id, self.id)
+                tick.blackboard.set('i', i + 1, tick.tree.id, self.id)
 
             return status
 
         return b3.FAILURE
-        

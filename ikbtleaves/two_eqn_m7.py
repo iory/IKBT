@@ -4,7 +4,7 @@
 
 # Copyright 2017 University of Washington
 
-# Developed by Dianmu Zhang and Blake Hannaford 
+# Developed by Dianmu Zhang and Blake Hannaford
 # BioRobotics Lab, University of Washington
 
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,7 +20,7 @@ import sympy as sp
 
 from ikbtfunctions.helperfunctions import *
 from ikbtbasics.kin_cl import *
-from ikbtbasics.ik_classes import *  
+from ikbtbasics.ik_classes import *
 from sys import exit
 import b3 as b3          # behavior trees
 
@@ -30,17 +30,18 @@ Bw = sp.Wild('Bw')
 Cw = sp.Wild('Cw')
 Dw = sp.Wild('Dw')
 Ew = sp.Wild('Ew')
- 
+
 thx = sp.Wild('thx')
 thy = sp.Wild('thy')
 thz = sp.Wild('thz')
 
+
 class simu_id(b3.Action):
-    # finding 
+    # finding
     #    c = Asin(th1) + Bcos(th1)
     #    d = Acos(th1) - Bsin(th2)  (nice arctan solution)
     #
-  
+
     def tick(self, tick):
         curr_unk = tick.blackboard.get('curr_unk')
         unknowns = tick.blackboard.get('unknowns')
@@ -55,14 +56,14 @@ class simu_id(b3.Action):
         eq1 = None
         eq2 = None
 
-        eqn_list= []
+        eqn_list = []
         if not curr_unk.solved:
             for e in one_unk:
                 e_flat = e.RHS - e.LHS
                 e_flat = e_flat.expand()
-                if e_flat.has(curr_unk.symbol) and e_flat.has(curr_unk.symbol):    
-                    e_flat= e_flat.collect(sp.sin(curr_unk.symbol))
-                    e_flat= e_flat.collect(sp.cos(curr_unk.symbol))
+                if e_flat.has(curr_unk.symbol) and e_flat.has(curr_unk.symbol):
+                    e_flat = e_flat.collect(sp.sin(curr_unk.symbol))
+                    e_flat = e_flat.collect(sp.cos(curr_unk.symbol))
                     if e_flat not in eqn_list:
                         eqn_list.append(e_flat)
 
@@ -81,10 +82,10 @@ class simu_id(b3.Action):
                 if self.BHdebug:
                     print "considering eqn: ", e_flat
                     print "d1 content (a, b)"
-                    print d1[Aw], '\n',d1[Bw]
+                    print d1[Aw], '\n', d1[Bw]
 
                 eq1 = e_flat
-                for j in range(i+1, len(eqn_list)):
+                for j in range(i + 1, len(eqn_list)):
                     e_flat = eqn_list[j]
                     if e_flat - eq1 == 0 or e_flat + eq1 == 0:
                         continue
@@ -96,11 +97,11 @@ class simu_id(b3.Action):
                     if self.BHdebug:
                         print "considering eqn: ", e_flat
                         print "d2 content (a, b)"
-                        print d2[Aw],'\n',d2[Bw]
+                        print d2[Aw], '\n', d2[Bw]
 
                     eq2 = e_flat
                     if (d1[Aw] == d2[Aw] or d1[Aw] == -d2[Aw]) \
-                        and (d1[Bw] == d2[Bw] or d1[Bw] == -d2[Bw]):
+                            and (d1[Bw] == d2[Bw] or d1[Bw] == -d2[Bw]):
                         found = True
                         if self.BHdebug:
                             print "found two equ two unknown"
@@ -109,7 +110,7 @@ class simu_id(b3.Action):
                     # it's also possible the order is reversed
                     # if that's the case, swap
                     elif (d1[Aw] == d2[Bw] or d1[Aw] == -d2[Bw]) \
-                        and (d1[Bw] == d2[Aw] or d1[Bw] == -d2[Aw]):
+                            and (d1[Bw] == d2[Aw] or d1[Bw] == -d2[Aw]):
                         print "reverse order"
                         found = True
                         temp = eq1
@@ -125,6 +126,7 @@ class simu_id(b3.Action):
 
         return b3.FAILURE
 
+
 class simu_solver(b3.Action):
     def tick(self, tick):
         curr_unk = tick.blackboard.get('curr_unk')
@@ -134,48 +136,48 @@ class simu_solver(b3.Action):
         unknowns = tick.blackboard.get('unknowns')
         R = tick.blackboard.get('Robot')
 
-
         A = eq1.coeff(sp.sin(curr_unk.symbol))
         B = eq1.coeff(sp.cos(curr_unk.symbol))
 
-        C = A*sp.sin(curr_unk.symbol) + B*sp.cos(curr_unk.symbol) - eq1
+        C = A * sp.sin(curr_unk.symbol) + B * sp.cos(curr_unk.symbol) - eq1
         C = C.simplify()
 
-        D = A*sp.cos(curr_unk.symbol) - B*sp.sin(curr_unk.symbol) - eq2
+        D = A * sp.cos(curr_unk.symbol) - B * sp.sin(curr_unk.symbol) - eq2
         D = D.simplify()
-
 
         if C == 0 and D == 0:
             print "Simultaneous Eqn Unsuccessful: divded by 0"
             return b3.FAILURE
 
+        sol = sp.atan2(A * C - B * D, A * D + B * C)
 
-        sol = sp.atan2(A*C - B*D, A*D + B*C)
-        
-        curr_unk.solutions=[sol]
+        curr_unk.solutions = [sol]
         # enable test for atan(0,0) case
-        curr_unk.argument = sp.Abs(A*C - B*D) + \
-                            sp.Abs(A*D + B*C)
+        curr_unk.argument = sp.Abs(A * C - B * D) + \
+            sp.Abs(A * D + B * C)
         curr_unk.nsolutions = 1
 
         curr_unk.set_solved(R, unknowns)
 
         return b3.SUCCESS
 
+
 class TestSolverm7(unittest.TestCase):
     def setUp(self):
         self.DB = False  # debug flag
         print '\n\n===============  Test sincos Solver  ====================='
         return
-    
+
     def runTest(self):
         self.test_m7()
-            
+
     def test_m7(self):
         sp.var('Px Py Pz th_1 th_23 th_3 a_3 a_2 d_4')
-        exp1 = Pz*sp.sin(th_23) + a_2*sp.cos(th_3) + a_3 + (-Px*sp.cos(th_1) - Py*sp.sin(th_1))*sp.cos(th_23)
+        exp1 = Pz * sp.sin(th_23) + a_2 * sp.cos(th_3) + a_3 + \
+            (-Px * sp.cos(th_1) - Py * sp.sin(th_1)) * sp.cos(th_23)
 
-        exp2 = Pz*sp.cos(th_23) - a_2*sp.sin(th_3) + d_4 + (Px*sp.cos(th_1) + Py*sp.sin(th_1))*sp.sin(th_23)
+        exp2 = Pz * sp.cos(th_23) - a_2 * sp.sin(th_3) + d_4 + \
+            (Px * sp.cos(th_1) + Py * sp.sin(th_1)) * sp.sin(th_23)
 
         keq1 = kequation(0, exp1)
         keq2 = kequation(0, exp2)
@@ -187,11 +189,8 @@ class TestSolverm7(unittest.TestCase):
 
         unknowns = [uth1, uth2, uth23]
 
-
         Rob = Robot()
         ik_tester = b3.BehaviorTree()
-
-
 
         # two equations one unknown,
         SimuEqnID = simu_id()
@@ -211,10 +210,8 @@ class TestSolverm7(unittest.TestCase):
 
         curr = bb.get('curr_unk')
         print curr.solutions
-                
+
+
 def run_test():
     suite2 = unittest.TestLoader().loadTestsFromTestCase(TestSolverm7)
     unittest.TextTestRunner(verbosity=2).run(suite2)
-
-            
-

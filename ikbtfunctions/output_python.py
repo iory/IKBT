@@ -22,17 +22,19 @@ import sympy as sp
 #import numpy as np
 from ikbtbasics.kin_cl import *
 from ikbtfunctions.helperfunctions import *
-from ikbtbasics.ik_classes import *     # special classes for Inverse kinematics in sympy
+# special classes for Inverse kinematics in sympy
+from ikbtbasics.ik_classes import *
 #
+
 
 def output_python_code(Robot, groups):
 
     fixed_name = Robot.name.replace(r'_', r'\_')  # this is for LaTex output
-    fixed_name = fixed_name.replace('test: ','')
-    orig_name  = Robot.name.replace('test: ', '')
+    fixed_name = fixed_name.replace('test: ', '')
+    orig_name = Robot.name.replace('test: ', '')
 
     DirName = 'CodeGen/Python/'
-    fname = DirName + 'IK_equations'+orig_name+'.py'
+    fname = DirName + 'IK_equations' + orig_name + '.py'
     f = open(fname, 'w')
     print >> f, '''#!/usr/bin/python
 #  Python inverse kinematic equations for ''' + fixed_name + '''
@@ -59,24 +61,21 @@ pi = np.pi
             tmp += str(p) + ' = XXXXX    # deliberate undeclared error!  USER needs to give numerical value \n'
     par_decl_str = tmp
 
-
     print >>f, '#  Declare the parameters'
     print >>f, par_decl_str
 
-
     nlist = Robot.solution_nodes
-    nlist.sort( ) # sort by solution order
+    nlist.sort()  # sort by solution order
 
+    indent = '    '  # 4 spaces
 
-    indent = '    ' # 4 spaces
-
-    funcname = 'ikin_'+fixed_name
+    funcname = 'ikin_' + fixed_name
     print >> f, '''
 # Code to solve the unknowns '''
-    print >>f, 'def', funcname +'(T):' # no indent
-    print >>f, indent+'if(T.shape != (4,4)):'
-    print >>f, indent*2 + 'print "bad input to "+funcname'
-    print >>f, indent*2 + 'quit()'
+    print >>f, 'def', funcname + '(T):'  # no indent
+    print >>f, indent + 'if(T.shape != (4,4)):'
+    print >>f, indent * 2 + 'print "bad input to "+funcname'
+    print >>f, indent * 2 + 'quit()'
     print >>f, '''#define the input vars
     r_11 = T[0,0]
     r_12 = T[0,1]
@@ -102,20 +101,21 @@ pi = np.pi
         print >>f, indent + '#Variable: ', str(node.symbol)
         for sol in node.solution_with_notations.values():
             if re.search('asin', str(sol.RHS)) or re.search('acos', str(sol.RHS)):
-                #print '  Found asin/acos solution ...', sol.LHS , ' "=" ',sol.RHS
-                tmp = re.search('\((.*)\)',str(sol.RHS))
-                print >>f, indent + 'if (solvable_pose and abs', tmp.group(0), ' > 1):'
-                print >>f, indent*2 + 'solvable_pose = False'
+                # print '  Found asin/acos solution ...', sol.LHS , ' "=" ',sol.RHS
+                tmp = re.search('\((.*)\)', str(sol.RHS))
+                print >>f, indent + \
+                    'if (solvable_pose and abs', tmp.group(0), ' > 1):'
+                print >>f, indent * 2 + 'solvable_pose = False'
                 print >>f, indent + 'else:'
                 tmp = str(sol.LHS) + ' = ' + str(sol.RHS)
                 print >>f, indent + tmp
             if re.search('atan', str(sol.RHS)):
-                print '  Found atan2 solution ...', sol.LHS , ' "=" ',sol.RHS
-                tmp = re.search('\((.*)\)',str(sol.RHS))
+                print '  Found atan2 solution ...', sol.LHS, ' "=" ', sol.RHS
+                tmp = re.search('\((.*)\)', str(sol.RHS))
                 tmp = str(sol.LHS) + ' = ' + str(sol.RHS)
                 print >>f, indent + tmp
             if node.solvemethod == 'algebra':
-                print '  Found algebra solution ... ' , sol.LHS , ' = ', sol.RHS
+                print '  Found algebra solution ... ', sol.LHS, ' = ', sol.RHS
                 print >>f, indent + str(sol.LHS) + ' = ' + str(sol.RHS)
 
     print >> f, '''
@@ -125,7 +125,6 @@ pi = np.pi
 #
 ###################################
 '''
-
 
     ###########################################################
     #
@@ -143,24 +142,23 @@ pi = np.pi
             print 'g: ', g, 't: ', t
             gs.append(str(t))
 
-        #print >>f, gs.sort # in place
+        # print >>f, gs.sort # in place
         grp_lists.append(gs)
 
-    print >>f, indent +  'solution_list = []'
+    print >>f, indent + 'solution_list = []'
     for g in grp_lists:
         g.sort()
         print >>f, indent + '#(note trailing commas allowed in python'
-        print >>f, indent +  'solution_list.append( [ ',
+        print >>f, indent + 'solution_list.append( [ ',
         for v in g:
             print >>f,  v + ', ',
         print >>f, '] )'
 
-
     # we are done.   Return
     print >>f, indent + 'if(solvable_pose):'
-    print >>f, indent*2 + 'return(solution_list)'
+    print >>f, indent * 2 + 'return(solution_list)'
     print >>f, indent + 'else: '
-    print >>f, indent*2 + 'return(False)'
+    print >>f, indent * 2 + 'return(False)'
 
     # __main__()  code for testing:
     print >>f, '''
@@ -221,6 +219,5 @@ if __name__ == "__main__":
 
 
     '''
-
 
     f.close()

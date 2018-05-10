@@ -4,6 +4,7 @@ import itertools
 
 __all__ = ['BehaviorTree']
 
+
 class BehaviorTree(object):
     def __init__(self):
         self.id = str(uuid.uuid1())
@@ -33,7 +34,8 @@ class BehaviorTree(object):
                 cls = getattr(b3, spec['name'])
 
             else:
-                raise AttibuteError('BehaviorTree.load: Invalid node name "%s"'%spec['name'])
+                raise AttibuteError(
+                    'BehaviorTree.load: Invalid node name "%s"' % spec['name'])
 
             node = cls()
             node.id = spec['id'] or node.id
@@ -43,9 +45,9 @@ class BehaviorTree(object):
             nodes[key] = node
 
         for key in data['nodes']:
-            spec  = data['nodes'][key]
+            spec = data['nodes'][key]
             node = nodes[key]
-            
+
             if node.category == b3.COMPOSITE and 'children' in spec:
                 for cid in spec['children']:
                     node.children.append(nodes[cid])
@@ -54,8 +56,7 @@ class BehaviorTree(object):
                 node.child = nodes[spec['child']]
 
         if (data['root']):
-            self.root = nodes[data['root']];
-
+            self.root = nodes[data['root']]
 
     def dump(self):
         data = {}
@@ -105,7 +106,6 @@ class BehaviorTree(object):
 
         return data
 
-
     def tick(self, target, blackboard):
 
         self.tick_count += 1
@@ -118,35 +118,33 @@ class BehaviorTree(object):
 
         # Tick node
         state = self.root._execute(tick)
-        
-        ###  BH Hacks
-        #if state != b3.RUNNING:
-	  #if state == b3.SUCCESS: 
-	    #print "Root node SUCCESS!!!"
-	  #if state == b3.FAILURE:
-    	    #print "Root node FAILURE!!!"
- 	  
-	  
-	##  BH:    code below nonfunctional with "RUNNING" nodes
-	##        and largely commented out  
+
+        # BH Hacks
+        # if state != b3.RUNNING:
+        # if state == b3.SUCCESS:
+        # print "Root node SUCCESS!!!"
+        # if state == b3.FAILURE:
+        # print "Root node FAILURE!!!"
+
+        # BH:    code below nonfunctional with "RUNNING" nodes
+        # and largely commented out
         # Close node from last tick, if needed
         last_open_nodes = blackboard.get('open_nodes', self.id)
         curr_open_nodes = tick._open_nodes
 
         start = 0
-        #for node1, node2 in itertools.izip(last_open_nodes, curr_open_nodes):
-            #start += 1
-            #if node1 != node2:
-                #break
+        # for node1, node2 in itertools.izip(last_open_nodes, curr_open_nodes):
+        #start += 1
+        # if node1 != node2:
+        # break
 
-        ## - close nodes
-        #for i in xrange(len(last_open_nodes)-1, start-1, -1):
-            #last_open_nodes[i]._close(tick);
+        # - close nodes
+        # for i in xrange(len(last_open_nodes)-1, start-1, -1):
+        # last_open_nodes[i]._close(tick);
 
         # Populate blackboard
         blackboard.set('open_nodes', curr_open_nodes, self.id)
         blackboard.set('node_count', tick._node_count, self.id)
-        
+
         return state
-        #return state
-      
+        # return state

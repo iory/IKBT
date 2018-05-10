@@ -1,5 +1,6 @@
 __all__ = ['Tick']
 
+
 class Tick(object):
     '''Tick Class.
 
@@ -19,7 +20,7 @@ class Tick(object):
 
     def __init__(self, tree=None, target=None, blackboard=None, debug=None):
         '''Constructor.
-    
+
         :param tree: a BehaviorTree instance.
         :param target: a target object.
         :param blackboard: a Blackboard instance.
@@ -50,7 +51,7 @@ class Tick(object):
 
     def _tick_node(self, node):
         '''Called when ticking a node (called by BaseNode).
-    
+
         :param node: a node instance.
         '''
         pass

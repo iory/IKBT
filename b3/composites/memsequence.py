@@ -2,6 +2,7 @@ import b3
 
 __all__ = ['MemSequence']
 
+
 class MemSequence(b3.Composite):
     def __init__(self, children=None):
         super(MemSequence, self).__init__(children)
@@ -18,7 +19,8 @@ class MemSequence(b3.Composite):
 
             if status != b3.SUCCESS:
                 if status == b3.RUNNING:
-                    tick.blackboard.set('running_child', i, tick.tree.id, self.id)
+                    tick.blackboard.set('running_child', i,
+                                        tick.tree.id, self.id)
                 return status
 
         return b3.SUCCESS

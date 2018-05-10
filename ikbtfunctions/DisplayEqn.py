@@ -30,85 +30,50 @@ import numpy as np
 from pykinsym import *
 #import helperfunctions as hf
 
-## 
+##
 #   Pretty Print a matrix (but elements should be "small")
 #
+
 
 def matrix_pp(M, indeces=False):
     if(not indeces):
         sp.pprint(notation_squeeze(M))
-    else:        
-       r = 0
-       for r in [0,1,2]:
-            print '\n Row ',r+1
-            for c in [0,1,2,3]:
-                print ' [',r+1,',',c+1,']'
-                #sp.pprint(notation_squeeze(sp.simplify(M[r,c])))
-                sp.pprint(notation_squeeze(sp.simplify(M[r,c])))   # lets move simplfy to updateT
-       
-       print '\n Row 4'
-       print '[  0,  0,  0,  1]'
-    
-    
-class display_eqn(b3.Action):    # action leaf for  
-    
-    def __init__(self):
-        super(b3.Action, self).__init__()
-        self.Name = '* display eqn *'
-        
-    def tick(self, tick):
-       Tm = tick.blackboard.get('Tm')   # the current matrix equation 
-       unknowns = tick.blackboard.get('unknowns')   # the current list of unknowns
-       print ' ------------- start                  Display Matrix Equation      ------------------'
-       print '\n'
-       matrix_pp(Tm.Td,True)
-       
-       print '\n     = '
-       matrix_pp(Tm.Ts, True)
-       print '\n\n     Variable list: '
-       vars = tick.blackboard.get('unknowns')
-       print 'Unknowns: '
-       for v in vars:
-           if(not v.solved):
-               print v.symbol, 
-       print '\nKnowns'
-       for v in vars:
-           if(v.solved):
-               print v.symbol,
-       print''
-       print ' -------------   end                  Display Matrix Equation      ------------------'
-       print '\n\n '
-       
-       raw_input (' <enter> to continue ')
-       return b3.SUCCESS 
-       
+    else:
+        r = 0
+        for r in [0, 1, 2]:
+            print '\n Row ', r + 1
+            for c in [0, 1, 2, 3]:
+                print ' [', r + 1, ',', c + 1, ']'
+                # sp.pprint(notation_squeeze(sp.simplify(M[r,c])))
+                # lets move simplfy to updateT
+                sp.pprint(notation_squeeze(sp.simplify(M[r, c])))
 
-class display_eqn_lists(b3.Action):    # action leaf for  
-    
+        print '\n Row 4'
+        print '[  0,  0,  0,  1]'
+
+
+class display_eqn(b3.Action):    # action leaf for
+
     def __init__(self):
         super(b3.Action, self).__init__()
         self.Name = '* display eqn *'
-        
+
     def tick(self, tick):
-        unknowns = tick.blackboard.get('unknowns')   # the current list of unknowns
-        R = tick.blackboard.get('Robot')
-        
-        one_unk = tick.blackboard.get('eqns_1u')
-        two_unk = tick.blackboard.get('eqns_2u')
-                
-        print ' ------------- start                  Display Equation Lists     ------------------'
-        print '\n One Unkowns:' 
-        for e in one_unk:
-            print e
-        print '\n Two Unkowns:' 
-        for e in two_unk:
-            print e
+        Tm = tick.blackboard.get('Tm')   # the current matrix equation
+        # the current list of unknowns
+        unknowns = tick.blackboard.get('unknowns')
+        print ' ------------- start                  Display Matrix Equation      ------------------'
+        print '\n'
+        matrix_pp(Tm.Td, True)
+
+        print '\n     = '
+        matrix_pp(Tm.Ts, True)
         print '\n\n     Variable list: '
         vars = tick.blackboard.get('unknowns')
         print 'Unknowns: '
         for v in vars:
             if(not v.solved):
-                print v.symbol, 
+                print v.symbol,
         print '\nKnowns'
         for v in vars:
             if(v.solved):
@@ -116,14 +81,50 @@ class display_eqn_lists(b3.Action):    # action leaf for
         print''
         print ' -------------   end                  Display Matrix Equation      ------------------'
         print '\n\n '
-        
-        raw_input (' <enter> to continue ')
-        return b3.SUCCESS 
-        
 
-    
-       
-##  put in test code here.  See sinANDcos.py for example
+        raw_input(' <enter> to continue ')
+        return b3.SUCCESS
+
+
+class display_eqn_lists(b3.Action):    # action leaf for
+
+    def __init__(self):
+        super(b3.Action, self).__init__()
+        self.Name = '* display eqn *'
+
+    def tick(self, tick):
+        # the current list of unknowns
+        unknowns = tick.blackboard.get('unknowns')
+        R = tick.blackboard.get('Robot')
+
+        one_unk = tick.blackboard.get('eqns_1u')
+        two_unk = tick.blackboard.get('eqns_2u')
+
+        print ' ------------- start                  Display Equation Lists     ------------------'
+        print '\n One Unkowns:'
+        for e in one_unk:
+            print e
+        print '\n Two Unkowns:'
+        for e in two_unk:
+            print e
+        print '\n\n     Variable list: '
+        vars = tick.blackboard.get('unknowns')
+        print 'Unknowns: '
+        for v in vars:
+            if(not v.solved):
+                print v.symbol,
+        print '\nKnowns'
+        for v in vars:
+            if(v.solved):
+                print v.symbol,
+        print''
+        print ' -------------   end                  Display Matrix Equation      ------------------'
+        print '\n\n '
+
+        raw_input(' <enter> to continue ')
+        return b3.SUCCESS
+
+
+# put in test code here.  See sinANDcos.py for example
 ##
-#if __name__ == '__main__':
-    
+# if __name__ == '__main__':

@@ -2,6 +2,7 @@ import b3
 
 __all__ = ['Repeater']
 
+
 class Repeater(b3.Decorator):
     def __init__(self, child, max_loop=-1):
         super(Repeater, self).__init__(child)
@@ -28,5 +29,3 @@ class Repeater(b3.Decorator):
 
         tick.blackboard.set('i', i, tick.tree.id, self.id)
         return status
-
-        

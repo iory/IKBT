@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-#     Test the helper functions 
+#     Test the helper functions
 #
 # Copyright 2017 University of Washington
 
@@ -23,58 +23,62 @@ from ikbtfunctions.helperfunctions import *
 
 #####################################################################################
 # Test code for the helperfunctions
-#       
-class TestSolver009(unittest.TestCase):    # change TEMPLATE to unique name (2 places)
+#
+
+
+# change TEMPLATE to unique name (2 places)
+class TestSolver009(unittest.TestCase):
     def setUp(self):
         sp.var('d_1 th_2 th_3 th_4 th_5')
-        self.ud1  = ikc.unknown(d_1)
+        self.ud1 = ikc.unknown(d_1)
         self.uth2 = ikc.unknown(th_2)
         self.uth3 = ikc.unknown(th_3)
         self.uth4 = ikc.unknown(th_4)
         self.uth5 = ikc.unknown(th_5)
         self.vars = [self.ud1, self.uth2, self.uth3, self.uth4, self.uth5]
         self.expression01 = self.uth2.symbol + sp.sin(self.uth4.symbol)
-        
+
         self.DB = False  # debug flag
-        #print '===============  Test helperfunctions  ====================='
+        # print '===============  Test helperfunctions  ====================='
         return
-    
+
     def runTest(self):
-        
+
         self.test_lhs()
         self.test_findobj()
         self.test_get_vars()
         self.test_get_unknowns()
         return
-            
+
     def test_lhs(self):
         x = ik_lhs()
         fs = 'ik_lhs()  FAIL'
-        self.assertTrue(x[0,0] == sp.var('r_11'), fs)
-        self.assertTrue(x[0,1] == sp.var('r_12'), fs)
-        self.assertTrue(x[1,0] == sp.var('r_21'), fs)
-        self.assertTrue(x[0,3] == sp.var('Px'), fs)
-        self.assertTrue(x[2,3] == sp.var('Pz'), fs)
+        self.assertTrue(x[0, 0] == sp.var('r_11'), fs)
+        self.assertTrue(x[0, 1] == sp.var('r_12'), fs)
+        self.assertTrue(x[1, 0] == sp.var('r_21'), fs)
+        self.assertTrue(x[0, 3] == sp.var('Px'), fs)
+        self.assertTrue(x[2, 3] == sp.var('Pz'), fs)
         t = 0
-        for j in [0,1,2,3]:
-            t = t + x[3,j]
+        for j in [0, 1, 2, 3]:
+            t = t + x[3, j]
         self.assertTrue(t == 1, fs)
         return
-        
+
     def test_findobj(self):
         fs = 'find_obj()  FAIL'
-        self.assertTrue(find_obj(self.uth3.symbol, self.vars) == self.vars[2], fs)
-        self.assertTrue(find_obj(ikc.unknown('random_name'), self.vars) == None, fs)
+        self.assertTrue(find_obj(self.uth3.symbol, self.vars)
+                        == self.vars[2], fs)
+        self.assertTrue(find_obj(ikc.unknown(
+            'random_name'), self.vars) == None, fs)
         return
-    
+
     def test_get_vars(self):
         fs = 'get_variables()  FAIL'
         vlist = get_variables(self.vars, self.expression01)
         self.assertTrue(vlist[0] == self.uth2, fs)
         self.assertTrue(vlist[1] == self.uth4, fs)
         return
-        
-    
+
     def test_get_unknowns(self):
         fs = 'get_unknowns()   FAIL'
         self.uth2.solved = True
@@ -82,7 +86,7 @@ class TestSolver009(unittest.TestCase):    # change TEMPLATE to unique name (2 p
         self.assertTrue(len(unks) == 1, fs)
         self.assertTrue(unks[0] == self.uth4)
         return
-        
+
 
 #
 #    Can run your test from command line by invoking this file
@@ -91,9 +95,8 @@ class TestSolver009(unittest.TestCase):    # change TEMPLATE to unique name (2 p
 #
 
 if __name__ == "__main__":
-    
+
     print '\n\n===============  Test helperfunctions ====================='
-    testsuite = unittest.TestLoader().loadTestsFromTestCase(TestSolver009)  # replace TEMPLATE 
+    testsuite = unittest.TestLoader().loadTestsFromTestCase(
+        TestSolver009)  # replace TEMPLATE
     unittest.TextTestRunner(verbosity=2).run(testsuite)
-   
-   

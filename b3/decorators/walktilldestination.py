@@ -2,6 +2,7 @@ import b3
 
 __all__ = ['WalkTillDestination']
 
+
 class WalkTillDestination(b3.Decorator):
     def __init__(self, child, max_loop=-1):
         super(RepeatUntilSuccess, self).__init__(child)
@@ -11,7 +12,6 @@ class WalkTillDestination(b3.Decorator):
     def open(self, tick):
         tick.blackboard.set('i', 0, tick.tree.id, self.id)
         tick.blackboard.set('distance', 0, tick.tree.id, self.id)
-        
 
     def tick(self, tick):
         if not self.child:
@@ -28,11 +28,9 @@ class WalkTillDestination(b3.Decorator):
             else:
                 d += 1
                 if d > tick.blackboard.get('distancetofire',  tick.tree.id, self.id):
-	            status = SUCCESS
+                    status = SUCCESS
                 break
 
         tick.blackboard.set('i', i, tick.tree.id, self.id)
         tick.blackboard.set('distance', d, tick.tree.id, self.id)
         return status
-
-        

@@ -2,6 +2,7 @@ import b3
 
 __all__ = ['MemPriority']
 
+
 class MemPriority(b3.Composite):
     def __init__(self, children=None):
         super(MemPriority, self).__init__(children)
@@ -18,7 +19,8 @@ class MemPriority(b3.Composite):
 
             if status != b3.FAILURE:
                 if status == b3.RUNNING:
-                    tick.blackboard.set('running_child', i, tick.tree.id, self.id)
+                    tick.blackboard.set('running_child', i,
+                                        tick.tree.id, self.id)
                 return status
 
         return b3.FAILURE
